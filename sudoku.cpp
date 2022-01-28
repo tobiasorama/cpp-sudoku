@@ -1,52 +1,35 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "board.h"
+#include "board.hpp"
 
 int main(int argc, char* argv[]) {
-  std::string s;
-  std::ifstream f(argv[1]);
-  while (f.good()) {
-    s += f.get();
-  }
-  f.close();
-
-  Board b = Board(s);
+  std::ifstream ifs(argv[1]);
+  Board b = Board(ifs);
   std::string inp;
-  std::cout << "----***SUDOKU***----\n\n";
-
   while (true) {
-    std::cout << b.make_string() << "\n";
-    std::cout << "Input positon and value (i j k l v) OR s to solve: ";
-    std::getline(std::cin, inp);
+    int row, col, val;
+    char inp;
     std::cout << "\n";
-    if (inp == "s") {
+    std::cout << b.make_string();
+    std::cout << "Input 'a' to solve, 'b' to enter value: ";
+    std::cin >> inp;
+    std::cout << "\n";
+    if (inp == 'a') {
       b.solve();
-      if (b.solved()) {
-        std::cout << "Solved!\n\n";
-      } else {
-        std::cout << "This board is unsolvable!\n\n";
-      }
       std::cout << b.make_string();
-      break;
-    } else if (inp.size() == 9) {
-      bool legal = inp.at(8) - 48 >= 0 && inp.at(8) - 48 <= 9? true: false;
-      for (int i = 0; i <= 3; i++) {
-        if (!(inp.at(2*i) - 48 >= 0 && inp.at(2*i) - 48 < 3 && inp.at(2*i + 1) == ' ')) {
-          legal = false;
-          break;
-        }
-      }
-
-      if (legal) {
-        int input [5] = {inp.at(0)-48, inp.at(2)-48, inp.at(4)-48, inp.at(6)-48, inp.at(8)-48};
-        b.add_value(input[0], input[1], input[2], input[3], input[4]);
+      if (b.solved()) {
+        std::cout << "The board is solved!\n";
       } else {
-        std::cout << "Invalid input\n\n";
+        std::cout << "The board cannot be solved\n";
       }
+      return 0;
     } else {
-      std::cout << "Invalid input\n\n";
-    }
+      std::cout << "Input (row column value): ";
+      std::cin >> row >> col >> val;
+      if (!b.add_value(row, col, val))
+        std::cout << "Not a valid value\n";
+    } 
   }
 
 }
